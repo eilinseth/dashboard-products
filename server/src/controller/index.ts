@@ -100,7 +100,6 @@ const updateProduct = async(req:Request,res:Response):Promise<void> => {
             res.status(404).json({message:"Id not found"})
             return
         }
-
         const [rows] = await pool.query("SELECT p.id,p.name,p.price,p.stock,p.description,p.id_category,c.name as category,p.image_url,p.created_at FROM products p JOIN categories c on c.id = p.id_category WHERE p.id = ?",[id])
 
         const product = rows[0]
@@ -117,7 +116,7 @@ const updateProduct = async(req:Request,res:Response):Promise<void> => {
         const image_url = req.file ? `http://localhost:5000/uploads/${req.file.filename}` : product.image_url
         
 
-        if(!name?.trim() || priceNumber <= 0 || Number.isNaN(priceNumber) || stockNumber <=0 || Number.isNaN(stockNumber) || !description?.trim() || categoryNumber <= 0 || Number.isNaN(categoryNumber) ){
+        if(!name?.trim() || priceNumber <= 0 || Number.isNaN(priceNumber) || stockNumber <0 || Number.isNaN(stockNumber) || !description?.trim() || categoryNumber <= 0 || Number.isNaN(categoryNumber) ){
             res.status(400).json({message:"Incomplete data"})
             return
         }

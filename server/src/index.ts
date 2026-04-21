@@ -1,13 +1,17 @@
+import dotenv from "dotenv"
+dotenv.config()
+
 import express from "express"
 import cors from "cors"
 import router from "./routes"
 import fs from "fs"
-import 'dotenv/config'
 
 if(!fs.existsSync('uploads')){
     fs.mkdirSync('uploads')
 }
 
+console.log(process.env.DB_HOST)
+console.log(process.env.DB_PASSWORD)
 const app = express()
 const port = 5000
 

@@ -52,7 +52,7 @@ const ProductForm:React.FC<formProp> = ({onSubmit,title,product}) => {
         name : product.name,
         price : product.price,
         stock : product.stock,
-        category : product.category_id,
+        category : product.id_category,
         description : product.description,
 
       })

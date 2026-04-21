@@ -16,7 +16,6 @@ function MainDashboard(){
     const recentProduct = [...data].sort((a,b)=>new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0,3)
     const stockZero = data.filter(product => product.stock === 0)
     console.log(data)
-
     if (isLoading) ( <div className="top-1/2 -translate-x-1/2 z-30">Loading ...</div>)
 
     return(
@@ -42,7 +41,7 @@ function MainDashboard(){
                                     
                                         <div className="font-bold text-base text-[#E5E7EB]">{product.name}</div>
                                         <div className="text-sm text-[#9CA3AF]">Added time : <p className="inline font-semibold">{formatDistanceToNowStrict(new Date(product.created_at.replace(" ","T")),{addSuffix:true})} </p> </div>
-                                        <div className="text-sm text-[#9CA3AF]">{product.description}</div>
+                                        <div className="text-sm text-[#9CA3AF]">{product.description.length > 20 ? product.description.slice(0,30)+" ..." : product.description}</div>
                                     
                                 </div>
                             </div>
@@ -69,7 +68,7 @@ function MainDashboard(){
                                         <div className="text-base text-[#E5E7EB] font-bold">{product.name}</div>
                                         <div className=" text-sm text-[#9CA3AF]">Stock remaining : <p className="font-semibold inline">{product.stock}</p></div>
                                     </div>
-                                    <button className="bg-[#3B82F6]  px-1  rounded-lg font-semibold w-32 cursor-pointer text-sm text-white ">-Update Product-</button>
+                                    <button className="bg-[#3B82F6]  px-1  rounded-lg font-semibold w-32 cursor-pointer text-sm text-white " onClick={()=>navigate(`/products/${product.id}`)}>-Update Product-</button>
                                 </div>
                             </div>
                         </div>
@@ -80,7 +79,7 @@ function MainDashboard(){
 
             <section className="mt-10 px-4">
                 <p className="font-semibold text-xl mb-4 text-[#E5E7EB]">Out of Stock :</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {stockZero.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {stockZero.slice(0,4).map(product => (
                     <div className="w-full shadow-xl bg-[#1F2937] pl-1.5 py-1.5 rounded-xl" key={product.id}>
                             <div className="flex gap-3">
@@ -94,13 +93,16 @@ function MainDashboard(){
                                         <div className="font-bold text-base text-[#E5E7EB]">{product.name}</div>
                                         <div className="text-sm  text-[#F87171]">Stock Remaining : <p className="font-semibold inline">{product.stock}</p></div>
                                     </div>
-                                    <button className="bg-[#3B82F6]  px-1  rounded-lg font-semibold w-32 cursor-pointer text-sm text-white ">-Update Product-</button>
+                                    <button className="bg-[#3B82F6]  px-1  rounded-lg font-semibold w-32 cursor-pointer text-sm text-white " onClick={() => navigate(`/products/${product.id}`)}>-Update Product-</button>
                                 </div>
                             </div>
                         </div>
                 ))}
                 {stockZero.length >= 5 ? <button className="block cursor-pointer font-semibold text-blue-600 text-xl mx-auto ">View All</button> : ""}
-                </div>
+                </div> : <div className="flex justify-center items-center ">
+                    <h1 className="text-[#E5E7EB] text-lg font-semibold">All products are in stock</h1>
+                </div> }
+                
             </section>
         </main>
     )
