@@ -39,7 +39,8 @@ function Products () {
         if(maxPrice) params.maxPrice = String(maxPrice)
 
         const query = new URLSearchParams(params).toString()
-        console.log(query)
+        navigate(`/products?${query}`)
+        setFilterState(false)
     }
 
     useEffect(() => {
@@ -84,6 +85,8 @@ function Products () {
                             setMaxPrice("")
                             setCategory(null)
                             setSelected(0)
+                            navigate("/products")
+                            setFilterState(false)
                         }} />
                         <X className="cursor-pointer size-6" onClick={() => setFilterState(false)} />
                     </div>

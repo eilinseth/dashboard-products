@@ -9,9 +9,6 @@ import fs from "fs"
 if(!fs.existsSync('uploads')){
     fs.mkdirSync('uploads')
 }
-
-console.log(process.env.DB_HOST)
-console.log(process.env.DB_PASSWORD)
 const app = express()
 const port = 5000
 

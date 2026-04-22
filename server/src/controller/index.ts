@@ -6,18 +6,52 @@ import { ResultSetHeader } from "mysql2";
 
 const getProducts = async(req:Request,res:Response):Promise<void> => {
     try{
-        const {stock,category} = req.query
+        const {stock,category,minPrice,maxPrice} = req.query
         let query = "SELECT p.id,p.name,p.price,p.stock,p.description,c.name as category,p.image_url,p.created_at FROM products p JOIN categories c ON c.id = p.id_category"
         const category_id = Number(category)
+        const minNumberPrice = Number(minPrice)
+        const maxNumberPrice = Number(maxPrice)
+        console.log(category_id,minNumberPrice,maxNumberPrice)
         const values = []
         if(stock === "low") {
             query += " WHERE stock <=?"
             values.push(10)
         }
-        if(category){
-            query += " WHERE p.id_category =?"
-            values.push(category_id)
+        if(category_id || minNumberPrice && Number.isNaN(minNumberPrice) || maxNumberPrice  && Number.isNaN(maxNumberPrice)){
+            if(minNumberPrice){
+                query += " WHERE price >= ? AND p.id_category = ?"
+                values.push(minNumberPrice,category_id)
+            }else if(maxNumberPrice){
+                query += " WHERE price <= ? AND p.id_category = ?"
+                values.push(maxNumberPrice,category_id)
+            }else if(category_id){
+                query += " WHERE p.id_category =?"
+                values.push(category_id)
+            }else if(minNumberPrice >= 0 && maxNumberPrice >=0){
+                query += " WHERE price BETWEEN ? AND ?"
+                values.push(minNumberPrice,maxNumberPrice)
+            }
+            else{ 
+                query += " WHERE (price BETWEEN ? AND ? ) AND p.id_category = ?"
+                values.push(minNumberPrice,maxNumberPrice,category_id)
+            }
         }
+    
+        
+
+        
+
+        if(minNumberPrice && Number.isNaN(minNumberPrice)){
+            query += " WHERE price >= ?"
+            values.push(minNumberPrice)
+        }
+
+        if(maxNumberPrice && Number.isNaN(maxNumberPrice)){
+            query += " WHERE price <= ?"
+            values.push(maxNumberPrice)
+        }
+
+        console.log(query)
         
 
         const [rows] = await pool.query(query,values)
