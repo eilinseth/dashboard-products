@@ -55,10 +55,15 @@ function Products () {
     )
 
     return(
-        <section className="w-full py-5 px-4">
-            <div className="text-white flex gap-3 mb-3 justify-end">
-                <SortDescIcon className="cursor-pointer"/>
-                <Filter className="cursor-pointer" onClick={() => setFilterState(true)}/>
+        <section className="w-full py-5 px-4 relative">
+            <div className="flex justify-between items-center -600 mb-5 sticky ">
+                <div className="flex-4 ">
+                    <input type="text" className="bg-slate-200 rounded-lg w-full py-0.5 px-2 text-black font-medium" placeholder="Search product ..." />
+                </div>
+                <div className="text-white flex gap-3 justify-end flex-1 ">
+                    <SortDescIcon className="cursor-pointer"/>
+                    <Filter className="cursor-pointer" onClick={() => setFilterState(true)}/>
+                </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
                 {data.map(product => (
@@ -78,7 +83,7 @@ function Products () {
             {filterState && (<div className="z-100 fixed bottom-0 w-full h-100 bg-slate-100 text-black rounded-t-xl overflow-y-scrol left-0 right-0">
                 <div className="px-4 py-4 flex flex-col gap-4">
                     <div className="flex justify-between items-center">
-                    <h1 className="text-2xl font-semibold tracking-wider">Filter</h1>
+                    <h2 className="text-2xl font-semibold tracking-wider">Filter</h2>
                     <div className="flex gap-3">
                         <RotateCcw className="cursor-pointer " onClick={() => {
                             setMinPrice("")
@@ -129,6 +134,42 @@ function Products () {
                 </div>
             </div>) }
             
+            <div className="z-100 fixed bottom-0 w-full h-110 bg-slate-100 text-black rounded-t-xl overflow-y-scrol left-0 right-0">
+                <div className="px-4 py-4 flex flex-col gap-4">
+                    <div className="flex justify-between items-center">
+                        <h2 className="tracking-wider text-xl font-semibold">Sort Product</h2>
+                        <div className="flex gap-3">
+                            <X className="cursor-pointer size-6"  />
+                        </div>
+                    </div>
+                    <div className="py-1 px-4 border-b flex justify-between items-center">
+                        <div className="text-lg font-medium">Name</div>
+                        <input type="radio" className="size-4" />
+                        </div>
+                    <div className="py-1 px-4 border-b flex justify-between items-center">
+                        <div className="text-lg font-medium">Price</div>
+                        <input type="radio" className="size-4" />
+                        </div>
+                    <div className="py-1 px-4 border-b flex justify-between items-center">
+                        <div className="text-lg font-medium">Stock</div>
+                        <input type="radio" className="size-4" />
+                        </div>
+                    <div className="py-1 px-4 border-b flex justify-between items-center">
+                        <div className="text-lg font-medium">Date Added</div>
+                        <input type="radio" className="size-4" />
+                        </div>
+                    <div className="text-lg font-medium flex flex-col gap-2">
+                        <h3>Sort Type</h3>
+                        <div className="flex gap-4 px-4">
+                            <button className="cursor-pointer px-2 bg-blue-500 text-white rounded-lg">Ascending</button>
+                            <button className="cursor-pointer px-2 bg-blue-500 text-white rounded-lg">Descending</button>
+                        </div>
+                    </div>
+                    <div className="flex justify-center ">
+                        <button className="fixed bottom-10 w-60 bg-slate-900 text-slate-100 font-medium px-2 py-1 rounded-xl cursor-pointer " onClick={onSubmit}>Sort</button>
+                    </div>
+                </div>
+            </div>
 
         </section>
     )
