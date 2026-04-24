@@ -53,6 +53,7 @@ function Products () {
         setFilterState(false)
         setSortState(false)
     }
+    console.log(data)
 
     useEffect(() => {
         if(filterState){
@@ -192,8 +193,8 @@ function Products () {
                         </div>
                     <div className="py-1 px-4 border-b flex justify-between items-center">
                         <div className="text-lg font-medium">Date Added</div>
-                        <input type="radio" checked={sortBy === "date"} className="size-4 cursor-pointer" name="sort" onChange={()=>{
-                            setSortBy("date")
+                        <input type="radio" checked={sortBy === "created_at"} className="size-4 cursor-pointer" name="sort" onChange={()=>{
+                            setSortBy("created_at")
                             setSortButton(true)
                             }} />
                         </div>

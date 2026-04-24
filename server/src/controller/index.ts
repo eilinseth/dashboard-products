@@ -7,7 +7,7 @@ import { ResultSetHeader } from "mysql2";
 
 const getProducts = async(req:Request,res:Response):Promise<void> => {
     try{
-        const {stock,category,minPrice,maxPrice,sortBy,sortType} = req.query
+        const {stock,category,minPrice,maxPrice} = req.query
         if((minPrice && Number.isNaN(Number(minPrice))) || (maxPrice && Number.isNaN(Number(maxPrice)))){
             console.error("error")
             return 
@@ -24,40 +24,47 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
         const category_id = Number(category)
         const values = []
         const conditions = []
-        
-        console.log(sortBy,sortType)
+        const inputSortBy = String(req.query.sortBy)
+        const inputSortType = String(req.query.sortType)
+        const sortBy = ['name','price','stock','created_at'].includes(inputSortBy) ? inputSortBy : 'created_at'
+        const sortType = inputSortType === 'asc' ? 'asc' : 'desc'
+
+        console.log(`p.${sortBy}`,sortType)
 
         if(category_id && minNumberPrice && maxNumberPrice){    
-            conditions.push( " (price BETWEEN ? AND ? ) AND p.id_category = ?")
+            conditions.push( " WHERE (price BETWEEN ? AND ? ) AND p.id_category = ?")
             values.push(minNumberPrice,maxNumberPrice,category_id)
         }
         if(minNumberPrice && category_id){
-            conditions.push( " price >= ? AND p.id_category = ?")
+            conditions.push( " WHERE price >= ? AND p.id_category = ?")
             values.push(minNumberPrice,category_id)
         }
         if(maxNumberPrice && category_id){
-            conditions.push( " price <= ? AND p.id_category = ?")
+            conditions.push( " WHERE price <= ? AND p.id_category = ?")
             values.push(maxNumberPrice,category_id)
         } 
         if(category_id){
-            conditions.push( " p.id_category =?")
+            conditions.push( " WHERE p.id_category =?")
             values.push(category_id)
         }
         if(stock === "low") {
-            conditions.push( " stock <=?")
+            conditions.push( " WHERE stock <=?")
             values.push(10)
         }
         if(minNumberPrice !== null){
-            conditions.push( " price >= ?")
+            conditions.push( " WHERE price >= ?")
             values.push(minNumberPrice)
         }
         if(maxNumberPrice !== null){
-            conditions.push( " price <= ?")
+            conditions.push( " WHERE price <= ?")
             values.push(maxNumberPrice)
+        }
+        if(sortBy){
+            query += ` ORDER BY p.${sortBy} ${sortType}`
         }
 
         if(conditions.length > 0){
-            query += " WHERE " +conditions.join(" AND ")
+            query += conditions.join(" AND ")
             console.log(query)
         }
         console.log(conditions)
