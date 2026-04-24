@@ -7,11 +7,14 @@ import { SortDescIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { RotateCcw } from "lucide-react"
 import { X } from "lucide-react"
+import toast from "react-hot-toast"
 
 type filterParams = {
     category ? : string
     minPrice ? : string
     maxPrice ? : string
+    sortBy ? : string
+    sortType ? : "asc" | "desc"
 }
 
 function Products () {
@@ -24,12 +27,17 @@ function Products () {
     })
     const [filterState,setFilterState] = useState(false)
     const [sortState , setSortState] = useState(false)
+    const [sortButton,setSortButton] = useState(false)
     const [minPrice , setMinPrice] = useState("")
     const [maxPrice , setMaxPrice] = useState("")
     const [selected,setSelected] = useState(0)
     const [category,setCategory] = useState<number | null>(null)
+    const [sortType,setSortType] = useState<"asc" | "desc">("asc")
+    const [sortBy,setSortBy] = useState("")
 
     console.log(params)
+    console.log(sortBy)
+    console.log(sortType)
     const navigate = useNavigate()
 
     function onSubmit(){
@@ -37,10 +45,13 @@ function Products () {
         if(category) params.category = String(category)
         if(minPrice) params.minPrice = String(minPrice)
         if(maxPrice) params.maxPrice = String(maxPrice)
+        if(sortBy) params.sortBy = sortBy
+        if(sortType) params.sortType = sortType
 
         const query = new URLSearchParams(params).toString()
         navigate(`/products?${query}`)
         setFilterState(false)
+        setSortState(false)
     }
 
     useEffect(() => {
@@ -53,6 +64,7 @@ function Products () {
     if(isLoading) return ( 
     <div className="absolute left-1/2 -translate-x-1/2">Loading ...</div>
     )
+    
 
     return(
         <section className="w-full py-5 px-4 relative">
@@ -61,8 +73,14 @@ function Products () {
                     <input type="text" className="bg-slate-200 rounded-lg w-full py-0.5 px-2 text-black font-medium" placeholder="Search product ..." />
                 </div>
                 <div className="text-white flex gap-3 justify-end flex-1 ">
-                    <SortDescIcon className="cursor-pointer"/>
-                    <Filter className="cursor-pointer" onClick={() => setFilterState(true)}/>
+                    <SortDescIcon className="cursor-pointer" onClick={() => {
+                        setSortState(true)
+                        setFilterState(false)
+                    }} />
+                    <Filter className="cursor-pointer" onClick={() => {
+                        setFilterState(true)
+                        setSortState(false)
+                        }}/>
                 </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -80,7 +98,7 @@ function Products () {
                 ))}
             </div>
 
-            {filterState && (<div className="z-100 fixed bottom-0 w-full h-100 bg-slate-100 text-black rounded-t-xl overflow-y-scrol left-0 right-0">
+            {filterState && (<div className="z-100 fixed bottom-0 w-full h-100 bg-slate-200 text-black rounded-t-xl overflow-y-scrol left-0 right-0">
                 <div className="px-4 py-4 flex flex-col gap-4">
                     <div className="flex justify-between items-center">
                     <h2 className="text-2xl font-semibold tracking-wider">Filter</h2>
@@ -98,19 +116,19 @@ function Products () {
                     </div>
                     <div className="font-semibold text-lg">Category</div>
                     <div className="font-semibold flex gap-4">
-                        <button className={selected === 1 ? "text-left text-slate-100 rounded-lg w-fit px-3 py-1 cursor-pointer bg-black": "text-left text-slate-700 rounded-lg bg-slate-200 w-fit px-3 py-1 cursor-pointer"} onClick={() => {
+                        <button className={selected === 1 ? "text-left text-slate-100 rounded-lg w-fit px-3 py-1 cursor-pointer bg-black": "text-left text-slate-700 rounded-lg bg-slate-300 w-fit px-3 py-1 cursor-pointer"} onClick={() => {
                             setSelected(1)
                             setCategory(1)
                             }}>Food</button>
-                        <button className={selected === 2 ? "text-left text-slate-100 rounded-lg w-fit px-3 py-1 cursor-pointer bg-black": "text-left text-slate-700 rounded-lg bg-slate-200 w-fit px-3 py-1 cursor-pointer"} onClick={() => {
+                        <button className={selected === 2 ? "text-left text-slate-100 rounded-lg w-fit px-3 py-1 cursor-pointer bg-black": "text-left text-slate-700 rounded-lg bg-slate-300 w-fit px-3 py-1 cursor-pointer"} onClick={() => {
                             setSelected(2)
                             setCategory(2)
                             }}>Drink</button>
-                        <button className={selected === 3 ? "text-left text-slate-100 rounded-lg w-fit px-3 py-1 cursor-pointer bg-black": "text-left text-slate-700 rounded-lg bg-slate-200 w-fit px-3 py-1 cursor-pointer"} onClick={() => {
+                        <button className={selected === 3 ? "text-left text-slate-100 rounded-lg w-fit px-3 py-1 cursor-pointer bg-black": "text-left text-slate-700 rounded-lg bg-slate-300 w-fit px-3 py-1 cursor-pointer"} onClick={() => {
                             setSelected(3)
                             setCategory(3)
                             }}>Electronic</button>
-                        <button className={selected === 4 ? "text-left text-slate-100 rounded-lg w-fit px-3 py-1 cursor-pointer bg-black": "text-left text-slate-700 rounded-lg bg-slate-200 w-fit px-3 py-1 cursor-pointer"} onClick={() => {
+                        <button className={selected === 4 ? "text-left text-slate-100 rounded-lg w-fit px-3 py-1 cursor-pointer bg-black": "text-left text-slate-700 rounded-lg bg-slate-300 w-fit px-3 py-1 cursor-pointer"} onClick={() => {
                             setSelected(4)
                             setCategory(4)
                             }}>Tool</button>
@@ -119,13 +137,16 @@ function Products () {
                     <div className="font-semibold flex gap-4">
                         <div className="flex flex-col gap-2">
                         Min Price
-                        <input type="number" className="bg-slate-300 rounded-lg px-2 text-slate-700 w-40 shadow-md" value={minPrice} onChange={(e) => setMinPrice(e.target.value)
+                        <input type="number" className="bg-slate-500 rounded-lg px-2 text-slate-100 font-semibold w-37 shadow-md" value={minPrice} name="minPrice" onChange={(e) => setMinPrice(e.target.value)
                         } />
+                        {/* <div className="flex bg-slate-500 items-center rounded-lg px-2">
+                        <label className="pl-1" htmlFor="minPrice">RP</label>
+                        </div> */}
                         </div>
                         <div className="mt-8"> - </div>
                         <div className="flex flex-col gap-2">
                         Max Price
-                        <input type="number" className="bg-slate-300 rounded-lg px-2 text-slate-700 w-40 shadow-md" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+                        <input type="number" className="bg-slate-500 rounded-lg px-2 text-slate-100 font-semibold w-37 shadow-md" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
                         </div>
                     </div>
                     <div className="flex justify-center ">
@@ -134,42 +155,66 @@ function Products () {
                 </div>
             </div>) }
             
-            <div className="z-100 fixed bottom-0 w-full h-110 bg-slate-100 text-black rounded-t-xl overflow-y-scrol left-0 right-0">
+            {sortState && <div className="z-100 fixed bottom-0 w-full h-110 bg-slate-200 text-black rounded-t-xl overflow-y-scrol left-0 right-0">
                 <div className="px-4 py-4 flex flex-col gap-4">
                     <div className="flex justify-between items-center">
                         <h2 className="tracking-wider text-xl font-semibold">Sort Product</h2>
                         <div className="flex gap-3">
-                            <X className="cursor-pointer size-6"  />
+                            <RotateCcw className="cursor-pointer " onClick={() => {
+                            setSelected(0)
+                            setSortState(false)
+                            setSortBy("")
+                            setSortButton(false)
+                        }} />
+                            <X className="cursor-pointer size-6" onClick={()=>setSortState(false)} />
                         </div>
                     </div>
                     <div className="py-1 px-4 border-b flex justify-between items-center">
                         <div className="text-lg font-medium">Name</div>
-                        <input type="radio" className="size-4" />
+                        <input type="radio" checked={sortBy === "name"} className="size-4 cursor-pointer" name="sort" onChange={()=>{
+                            setSortBy("name")
+                            setSortButton(true)
+                            }} />
                         </div>
                     <div className="py-1 px-4 border-b flex justify-between items-center">
                         <div className="text-lg font-medium">Price</div>
-                        <input type="radio" className="size-4" />
+                        <input type="radio" checked={sortBy === "price"} className="size-4 cursor-pointer" name="sort" onChange={()=>{
+                            setSortBy("price")
+                            setSortButton(true)
+                            }} />
                         </div>
                     <div className="py-1 px-4 border-b flex justify-between items-center">
                         <div className="text-lg font-medium">Stock</div>
-                        <input type="radio" className="size-4" />
+                        <input type="radio" checked={sortBy === "stock"} className="size-4 cursor-pointer" name="sort" onChange={()=>{
+                            setSortBy("stock")
+                            setSortButton(true)
+                            }} />
                         </div>
                     <div className="py-1 px-4 border-b flex justify-between items-center">
                         <div className="text-lg font-medium">Date Added</div>
-                        <input type="radio" className="size-4" />
+                        <input type="radio" checked={sortBy === "date"} className="size-4 cursor-pointer" name="sort" onChange={()=>{
+                            setSortBy("date")
+                            setSortButton(true)
+                            }} />
                         </div>
                     <div className="text-lg font-medium flex flex-col gap-2">
                         <h3>Sort Type</h3>
                         <div className="flex gap-4 px-4">
-                            <button className="cursor-pointer px-2 bg-blue-500 text-white rounded-lg">Ascending</button>
-                            <button className="cursor-pointer px-2 bg-blue-500 text-white rounded-lg">Descending</button>
+                            <button className={selected === 5 ? "cursor-pointer px-2 bg-slate-900 text-white rounded-lg" :"cursor-pointer px-2 bg-slate-300 text-slate-700 rounded-lg"} onClick={() => {
+                                setSortType("asc")
+                                setSelected(5)
+                                }}>Ascending</button>
+                            <button className={selected === 6 ? "cursor-pointer px-2 bg-slate-900 text-white rounded-lg" :"cursor-pointer px-2 bg-slate-300 text-slate-700 rounded-lg"} onClick={() => {
+                                setSortType("desc")
+                                setSelected(6)
+                                }}>Descending</button>
                         </div>
                     </div>
-                    <div className="flex justify-center ">
+                    {sortButton && <div className="flex justify-center ">
                         <button className="fixed bottom-10 w-60 bg-slate-900 text-slate-100 font-medium px-2 py-1 rounded-xl cursor-pointer " onClick={onSubmit}>Sort</button>
-                    </div>
+                    </div>}
                 </div>
-            </div>
+            </div>}
 
         </section>
     )

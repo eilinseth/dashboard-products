@@ -7,7 +7,7 @@ import { ResultSetHeader } from "mysql2";
 
 const getProducts = async(req:Request,res:Response):Promise<void> => {
     try{
-        const {stock,category,minPrice,maxPrice} = req.query
+        const {stock,category,minPrice,maxPrice,sortBy,sortType} = req.query
         if((minPrice && Number.isNaN(Number(minPrice))) || (maxPrice && Number.isNaN(Number(maxPrice)))){
             console.error("error")
             return 
@@ -25,7 +25,7 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
         const values = []
         const conditions = []
         
-        console.log(category_id,minNumberPrice,maxNumberPrice)
+        console.log(sortBy,sortType)
 
         if(category_id && minNumberPrice && maxNumberPrice){    
             conditions.push( " (price BETWEEN ? AND ? ) AND p.id_category = ?")
