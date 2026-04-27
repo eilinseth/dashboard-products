@@ -16,7 +16,8 @@ function MainDashboard(){
     const recentProduct = [...data].sort((a,b)=>new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0,3)
     const stockZero = data.filter(product => product.stock === 0)
     console.log(data)
-    if (isLoading) ( <div className="top-1/2 -translate-x-1/2 z-30">Loading ...</div>)
+    if(!data) (<div className="top-1/2 left-1/2 -translate-x-1/2 z-30 text-white">Loading ...</div>)
+    if (isLoading) ( <div className="top-1/2 left-1/2 -translate-x-1/2 z-30 text-white">Loading ...</div>)
 
     return(
         <main className="mt-10 ">

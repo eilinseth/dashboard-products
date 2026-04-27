@@ -89,7 +89,7 @@ function Products () {
                         }}/>
                 </div>
             </div>
-            {data.length > 0 ? (
+            {data?.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
                 {data.map(product => (
                     <div key={product.id} className="text-[#E5E7EB] bg-[#2A3A50] pb-3 flex flex-col gap-2 rounded-t-2xl rounded-b-lg overflow-hidden cursor-pointer h-66 shadow-lg shadow-slate-800" onClick={()=>navigate(`/products/${product.id}`)}>

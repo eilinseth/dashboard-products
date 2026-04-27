@@ -121,10 +121,11 @@ const getProduct = async (req:Request,res:Response):Promise<void>  =>{
 const addProduct = async(req:Request,res:Response):Promise<void> => {
     try{
 
-        const {name,price,stock,description,category} = req.body
+        const {name,price,stock,category} = req.body
         const priceNumber = Number(price)
         const stockNumber = Number(stock)
         const categoryNumber = Number(category)
+        const description = typeof req.body.description === "string" ? req.body.description.trim() || "" : ""
         const image_url = req.file ? `http://localhost:5000/uploads/${req.file.filename}` : null
         console.log(req.file)
         console.log(req.body)
@@ -138,7 +139,7 @@ const addProduct = async(req:Request,res:Response):Promise<void> => {
         }
         const created_at = new Date()
         
-        const [result] = await pool.query<ResultSetHeader>("INSERT INTO products (name,price,stock,description,id_category,image_url,created_at) values(?,?,?,?,?,?,?)",[name,priceNumber,stockNumber,description.trim(),categoryNumber,image_url,created_at])
+        const [result] = await pool.query<ResultSetHeader>("INSERT INTO products (name,price,stock,description,id_category,image_url,created_at) values(?,?,?,?,?,?,?)",[name,priceNumber,stockNumber,description,categoryNumber,image_url,created_at])
     
         res.json({
             status:201,
@@ -167,7 +168,8 @@ const updateProduct = async(req:Request,res:Response):Promise<void> => {
         const price = req.body.price ?? product.price
         const stock = req.body.stock ?? product.stock
         const category = req.body.category ?? product.category
-        const description = req.body.description ?? product.description
+        const rawDescription = req.body.description ?? product.description
+        const description = typeof rawDescription === "string" ? rawDescription.trim() : ""
 
         const priceNumber = Number(price)
         const stockNumber = Number(stock)
@@ -175,7 +177,7 @@ const updateProduct = async(req:Request,res:Response):Promise<void> => {
         const image_url = req.file ? `http://localhost:5000/uploads/${req.file.filename}` : product.image_url
         
 
-        if(!name?.trim() || priceNumber <= 0 || Number.isNaN(priceNumber) || stockNumber <0 || Number.isNaN(stockNumber) || !description?.trim() || categoryNumber <= 0 || Number.isNaN(categoryNumber) ){
+        if(!name?.trim() || priceNumber <= 0 || Number.isNaN(priceNumber) || stockNumber <0 || Number.isNaN(stockNumber)  || categoryNumber <= 0 || Number.isNaN(categoryNumber) ){
             res.status(400).json({message:"Incomplete data"})
             return
         }
