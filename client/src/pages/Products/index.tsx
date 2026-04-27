@@ -7,7 +7,6 @@ import { SortDescIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import { RotateCcw } from "lucide-react"
 import { X } from "lucide-react"
-import toast from "react-hot-toast"
 
 type filterParams = {
     category ? : string
@@ -15,6 +14,7 @@ type filterParams = {
     maxPrice ? : string
     sortBy ? : string
     sortType ? : "asc" | "desc"
+    searchItem ? : string
 }
 
 function Products () {
@@ -34,10 +34,8 @@ function Products () {
     const [category,setCategory] = useState<number | null>(null)
     const [sortType,setSortType] = useState<"asc" | "desc">("asc")
     const [sortBy,setSortBy] = useState("")
+    const [searchItem,setSearchItem] = useState("")
 
-    console.log(params)
-    console.log(sortBy)
-    console.log(sortType)
     const navigate = useNavigate()
 
     function onSubmit(){
@@ -47,13 +45,14 @@ function Products () {
         if(maxPrice) params.maxPrice = String(maxPrice)
         if(sortBy) params.sortBy = sortBy
         if(sortType) params.sortType = sortType
+        if(searchItem) params.searchItem = searchItem
+
 
         const query = new URLSearchParams(params).toString()
         navigate(`/products?${query}`)
         setFilterState(false)
         setSortState(false)
     }
-    console.log(data)
 
     useEffect(() => {
         if(filterState){
@@ -63,15 +62,21 @@ function Products () {
         }
     })
     if(isLoading) return ( 
-    <div className="absolute left-1/2 -translate-x-1/2">Loading ...</div>
+    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 text-xl text-white">Loading ...</div>
     )
     
 
     return(
-        <section className="w-full py-5 px-4 relative">
+        <section className="w-full py-5 px-4 relative min-h-screen">
+            
             <div className="flex justify-between items-center -600 mb-5 sticky ">
                 <div className="flex-4 ">
-                    <input type="text" className="bg-slate-200 rounded-lg w-full py-0.5 px-2 text-black font-medium" placeholder="Search product ..." />
+                    <input type="text" className="bg-slate-200 rounded-lg w-full py-0.5 px-2 text-black font-medium" placeholder="Search product ..." onChange={(e) => {
+                        setSearchItem(e.target.value)
+                    }} onKeyDown={(e) =>{
+                        if(e.key !== "Enter") return
+                        onSubmit()
+                    }}/>
                 </div>
                 <div className="text-white flex gap-3 justify-end flex-1 ">
                     <SortDescIcon className="cursor-pointer" onClick={() => {
@@ -84,20 +89,27 @@ function Products () {
                         }}/>
                 </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            {data.length > 0 ? (
+                <div className="grid grid-cols-2 gap-4">
                 {data.map(product => (
                     <div key={product.id} className="text-[#E5E7EB] bg-[#2A3A50] pb-3 flex flex-col gap-2 rounded-t-2xl rounded-b-lg overflow-hidden cursor-pointer h-66 shadow-lg shadow-slate-800" onClick={()=>navigate(`/products/${product.id}`)}>
                         <div className="border border-black h-3/4 overflow-hidden ">
                             <img src={product.image_url || "https://loremflickr.com/300/300/food"} onError={(e) => e.currentTarget.src = "https://loremflickr.com/300/300/food"} className="object-cover hover:scale-120 transition duration-400 overflow-hidden"/>
                         </div>
                         <div className="flex flex-col px-1">
-                            <div className="text-xl font-bold "> {product.name}</div>
-                            <div className="text-base font-semibold text-slate-400">Added : {new Date(product.created_at).toLocaleDateString("id-ID")}</div>
-                            <div className={product.stock > 0 ? "text-base font-semibold text-slate-400" : "text-base font-semibold text-red-400"}>Stock : {product.stock}</div>
+                            <div className="text-lg font-bold "> {product.name}</div>
+                            <div className="text-sm font-semibold text-slate-400">Added : {new Date(product.created_at).toLocaleDateString("id-ID")}</div>
+                            <div className="text-sm font-bold text-green-600 ">{new Intl.NumberFormat("id-ID",{
+                                currency : "IDR",
+                                style : "currency",
+                                maximumFractionDigits:0
+                            }).format(product.price) }</div>
+                            <div className={product.stock > 0 ? "text-sm font-semibold text-slate-400" : "text-sm font-semibold text-red-400"}>Stock : {product.stock}</div>
                         </div>
                     </div>
                 ))}
             </div>
+            ) : <div className="absolute -translate-x-1/2 top-1/2 left-1/2 text-lg text-white">No products available</div> }
 
             {filterState && (<div className="z-100 fixed bottom-0 w-full h-100 bg-slate-200 text-black rounded-t-xl overflow-y-scrol left-0 right-0">
                 <div className="px-4 py-4 flex flex-col gap-4">

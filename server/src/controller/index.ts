@@ -26,48 +26,57 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
         const conditions = []
         const inputSortBy = String(req.query.sortBy)
         const inputSortType = String(req.query.sortType)
-        const sortBy = ['name','price','stock','created_at'].includes(inputSortBy) ? inputSortBy : 'created_at'
-        const sortType = inputSortType === 'asc' ? 'asc' : 'desc'
-
-        console.log(`p.${sortBy}`,sortType)
+        const searchItem = req.query.searchItem 
+        if(typeof searchItem === "string"){
+            const searchItemTrimmed = searchItem.trim()
+            if(searchItemTrimmed){
+                conditions.push("p.name LIKE ?")
+                values.push(`%${searchItemTrimmed}%`)
+            }
+        }
+        console.log(inputSortBy)
 
         if(category_id && minNumberPrice && maxNumberPrice){    
-            conditions.push( " WHERE (price BETWEEN ? AND ? ) AND p.id_category = ?")
+            conditions.push( "(price BETWEEN ? AND ? ) AND p.id_category = ?")
             values.push(minNumberPrice,maxNumberPrice,category_id)
         }
         if(minNumberPrice && category_id){
-            conditions.push( " WHERE price >= ? AND p.id_category = ?")
+            conditions.push( "price >= ? AND p.id_category = ?")
             values.push(minNumberPrice,category_id)
         }
         if(maxNumberPrice && category_id){
-            conditions.push( " WHERE price <= ? AND p.id_category = ?")
+            conditions.push( "price <= ? AND p.id_category = ?")
             values.push(maxNumberPrice,category_id)
         } 
         if(category_id){
-            conditions.push( " WHERE p.id_category =?")
+            conditions.push( "p.id_category =?")
             values.push(category_id)
         }
         if(stock === "low") {
-            conditions.push( " WHERE stock <=?")
+            conditions.push( "stock <=?")
             values.push(10)
         }
         if(minNumberPrice !== null){
-            conditions.push( " WHERE price >= ?")
+            conditions.push( "price >= ?")
             values.push(minNumberPrice)
         }
         if(maxNumberPrice !== null){
-            conditions.push( " WHERE price <= ?")
+            conditions.push( "price <= ?")
             values.push(maxNumberPrice)
         }
-        if(sortBy){
-            query += ` ORDER BY p.${sortBy} ${sortType}`
-        }
-
         if(conditions.length > 0){
-            query += conditions.join(" AND ")
-            console.log(query)
+            query += " WHERE " + conditions.join(" AND ")
+        }
+        if(typeof inputSortBy === "string"){
+            const sortBy = ['name','price','stock','created_at'].includes(inputSortBy) ? inputSortBy : 'created_at'
+            const sortType = inputSortType === 'asc' ? 'asc' : 'desc'
+            if(sortBy){
+                query += (` ORDER BY p.${sortBy} ${sortType}`)
+            }
+
         }
         console.log(conditions)
+        console.log(query)
         
 
         const [rows] = await pool.query(query,values)
