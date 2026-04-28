@@ -18,7 +18,10 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
             console.error("error")
             return
         }
-
+        const rawPage = Number(req.query.page)
+        const page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage
+        const limit = 10
+        const offset = (page - 1) * limit
         let query = "SELECT p.id,p.name,p.price,p.stock,p.description,c.name as category,p.image_url,p.created_at FROM products p JOIN categories c ON c.id = p.id_category"
 
         const category_id = Number(category)
@@ -27,6 +30,8 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
         const inputSortBy = String(req.query.sortBy)
         const inputSortType = String(req.query.sortType)
         const searchItem = req.query.searchItem 
+        console.log(page)
+        
         if(typeof searchItem === "string"){
             const searchItemTrimmed = searchItem.trim()
             if(searchItemTrimmed){
@@ -34,8 +39,6 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
                 values.push(`%${searchItemTrimmed}%`)
             }
         }
-        console.log(inputSortBy)
-
         if(category_id && minNumberPrice && maxNumberPrice){    
             conditions.push( "(price BETWEEN ? AND ? ) AND p.id_category = ?")
             values.push(minNumberPrice,maxNumberPrice,category_id)
@@ -75,7 +78,11 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
             }
 
         }
-        console.log(conditions)
+        if(page){
+            query += " limit ? offset ?"
+            values.push(limit,offset)
+        }
+        console.log(offset)
         console.log(query)
         
 

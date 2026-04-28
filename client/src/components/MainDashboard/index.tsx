@@ -55,7 +55,7 @@ function MainDashboard(){
 
             <section className="mt-10 px-4 ">
                 <p className="text-xl font-semibold mb-4 text-[#E5E7EB]">Low Stock List :</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {lowStock.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {lowStock.slice(0,4).map(product =>(
                         <div key={product.id} className="w-full shadow-xl bg-[#1F2937] pl-1.5 rounded-xl py-1.5 ">
                             <div className="flex gap-3">
@@ -75,7 +75,8 @@ function MainDashboard(){
                         </div>
                     ))}
                     {lowStock.length >=5 ? <button className="block cursor-pointer font-semibold text-blue-600 text-xl mx-auto " onClick={() => navigate("/products?stock=low")}>View All</button> : "" }
-                </div>
+                </div> : <div className="flex justify-center items-center text-[#E5E7EB] text-lg font-semibold">No products with low stock</div> }
+                
             </section>
 
             <section className="mt-10 px-4">
