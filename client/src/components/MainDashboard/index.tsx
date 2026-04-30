@@ -5,26 +5,26 @@ import { formatDistanceToNowStrict} from "date-fns"
 import { useNavigate } from "react-router-dom"
 
 function MainDashboard(){
-    const {data = [],isLoading} = useQuery<product[]>({
+    const {data ,isLoading} = useQuery({
         queryKey:['products'],
         queryFn : () => getProducts()
     })
     const navigate = useNavigate()
 
-
-    const lowStock = data.filter(product => product.stock <=10)
-    const recentProduct = [...data].sort((a,b)=>new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0,3)
-    const stockZero = data.filter(product => product.stock === 0)
-    console.log(data)
+    const products : product[] = data?.data ?? []
+    const lowStock = products?.filter(product => product.stock <=10)
+    const recentProduct = [...products].sort((a,b)=>new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0,3)
+    const stockZero = products?.filter(product => product.stock === 0)
     if(!data) (<div className="top-1/2 left-1/2 -translate-x-1/2 z-30 text-white">Loading ...</div>)
     if (isLoading) ( <div className="top-1/2 left-1/2 -translate-x-1/2 z-30 text-white">Loading ...</div>)
+    console.log(products)
 
     return(
         <main className="mt-10 ">
             <section className="grid grid-cols-2 items-start  gap-4 w-3/4 mx-auto">
-                <div className="border-2 font-semibold p-2 text-center text-xl bg-[#052E16] text-[#4ADE80]">Total Stock <br /> {data? data?.length :"8"}</div>
-                <div className="border-2  font-semibold p-2 text-center text-xl bg-[#422006] text-[#FACC15]">Low Stock <br /> {data?.filter(product =>product.stock <=10).length}</div>
-                <div className="border-2 p-2 col-span-2 text-center text-xl w-[60%] justify-self-center bg-[#450A0A] text-[#F87171] font-semibold">Out of Stock <br />{data?.filter(product => product.stock === 0).length}</div>
+                <div className="border-2 font-semibold p-2 text-center text-xl bg-[#052E16] text-[#4ADE80]">Total Stock <br /> {data? data.total : 0}</div>
+                <div className="border-2  font-semibold p-2 text-center text-xl bg-[#422006] text-[#FACC15]">Low Stock <br /> {products?.filter(product =>product.stock <=10).length}</div>
+                <div className="border-2 p-2 col-span-2 text-center text-xl w-[60%] justify-self-center bg-[#450A0A] text-[#F87171] font-semibold">Out of Stock <br />{products?.filter(product => product.stock === 0).length}</div>
             </section>
 
             <section className="mt-10 px-4">
@@ -55,7 +55,7 @@ function MainDashboard(){
 
             <section className="mt-10 px-4 ">
                 <p className="text-xl font-semibold mb-4 text-[#E5E7EB]">Low Stock List :</p>
-                {lowStock.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {lowStock.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {lowStock.slice(0,4).map(product =>(
                         <div key={product.id} className="w-full shadow-xl bg-[#1F2937] pl-1.5 rounded-xl py-1.5 ">
                             <div className="flex gap-3">
@@ -75,7 +75,7 @@ function MainDashboard(){
                         </div>
                     ))}
                     {lowStock.length >=5 ? <button className="block cursor-pointer font-semibold text-blue-600 text-xl mx-auto " onClick={() => navigate("/products?stock=low")}>View All</button> : "" }
-                </div> : <div className="flex justify-center items-center text-[#E5E7EB] text-lg font-semibold">No products with low stock</div> }
+                </div> :  <div className="flex justify-center items-center text-[#E5E7EB] text-lg font-semibold">No products with low stock</div> }
                 
             </section>
 

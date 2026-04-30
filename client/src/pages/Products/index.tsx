@@ -21,10 +21,24 @@ function Products () {
     const [searchParams] = useSearchParams()
     const params = Object.fromEntries(searchParams)
 
-    const {data = [] , isLoading} = useQuery<product[]>({
+    const {data , isLoading} = useQuery({
         queryKey:["products",{params}],
         queryFn: () => getProducts(params)
     })
+
+    const totalPage = Math.ceil(data?.total / data?.limit)
+    const pages = []
+    if(totalPage){
+        for(let i = 1 ; i <= totalPage ; i++){
+            pages.push(i)
+        }
+    }
+    console.log(totalPage)
+    console.log(pages)
+
+
+
+    const products : product[] = data?.data ?? []
     const [filterState,setFilterState] = useState(false)
     const [sortState , setSortState] = useState(false)
     const [sortButton,setSortButton] = useState(false)
@@ -65,9 +79,10 @@ function Products () {
     <div className="absolute left-1/2 top-1/2 -translate-x-1/2 text-xl text-white">Loading ...</div>
     )
     
+    console.log(data)
 
     return(
-        <section className="w-full py-5 px-4 relative min-h-screen">
+        <section className="w-full pt-5 pb-1 px-4 relative min-h-screen ">
             
             <div className="flex justify-between items-center -600 mb-5 sticky ">
                 <div className="flex-4 ">
@@ -89,9 +104,9 @@ function Products () {
                         }}/>
                 </div>
             </div>
-            {data?.length > 0 ? (
+            {products?.length > 0 ? (
                 <div className="grid grid-cols-2 gap-4">
-                {data.map(product => (
+                {products.map(product => (
                     <div key={product.id} className="text-[#E5E7EB] bg-[#2A3A50] pb-3 flex flex-col gap-2 rounded-t-2xl rounded-b-lg overflow-hidden cursor-pointer h-66 shadow-lg shadow-slate-800" onClick={()=>navigate(`/products/${product.id}`)}>
                         <div className="border border-black h-3/4 overflow-hidden ">
                             <img src={product.image_url || "https://loremflickr.com/300/300/food"} onError={(e) => e.currentTarget.src = "https://loremflickr.com/300/300/food"} className="object-cover hover:scale-120 transition duration-400 overflow-hidden"/>
@@ -228,7 +243,10 @@ function Products () {
                     </div>}
                 </div>
             </div>}
-
+            {totalPage && <div className="flex gap-2 justify-center items-center  text-white w-full mt-8">
+            {pages.map(page => {
+            return <button key={page} className="px-3 py-1.5 rounded-lg bg-slate-800 text-white hover:bg-slate-700 transition cursor-pointer " onClick={() => navigate(`/products?page=${page}`)}>{page}</button>
+            })}</div> }
         </section>
     )
 }

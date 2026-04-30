@@ -1,5 +1,4 @@
 import axios from "axios"
-import type { product } from "../../types"
 
 type ProductParams = {
     stock?:string
@@ -8,10 +7,11 @@ type ProductParams = {
 
 }
 
-export const getProducts = async(params?:ProductParams):Promise<product[]> =>{
+
+export const getProducts = async(params?:ProductParams) =>{
     try{
         const res = await axios.get("http://localhost:5000/products",{params})
-        return res.data.data
+        return res.data
     }catch(e){
         throw new Error(`${e}`)
     }

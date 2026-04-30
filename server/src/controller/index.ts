@@ -19,7 +19,7 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
             return
         }
         const rawPage = Number(req.query.page)
-        const page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage
+        let page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage
         const limit = 10
         const offset = (page - 1) * limit
         let query = "SELECT p.id,p.name,p.price,p.stock,p.description,c.name as category,p.image_url,p.created_at FROM products p JOIN categories c ON c.id = p.id_category"
@@ -84,14 +84,21 @@ const getProducts = async(req:Request,res:Response):Promise<void> => {
         }
         console.log(offset)
         console.log(query)
-        
-
+        const [total] = await pool.query("SELECT count(*) as total from products")
+        console.log(total[0].total)
+        const totalData = total[0].total
         const [rows] = await pool.query(query,values)
         const data = rows as Products[]
+        let totalPage = Math.ceil(total[0].total / limit)
+        if( page > totalPage && totalPage > 0) page = totalPage 
+
         res.json({
             status:200,
             message:"OK",
-            data
+            data,
+            total : totalData,
+            limit,
+            page
         })
     }catch(error){
         console.error(error)
