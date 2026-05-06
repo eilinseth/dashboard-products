@@ -31,7 +31,7 @@ function Navbar() {
                 <p className="text-white text-[10px]">Category</p>
             </div>
         </NavLink>
-        <NavLink to="/settings" className={({isActive}) => isActive ? " scale-130 shadow-[0_0_5px_#22d3ee,0_0_12px_#22d3ee] bg-cyan-700 cursor-pointer w-16  rounded-full h-10 flex justify-center items-center" : "cursor-pointer w-16  rounded-full h-10 flex justify-center items-center"}>
+        <NavLink to="/login" className={({isActive}) => isActive ? " scale-130 shadow-[0_0_5px_#22d3ee,0_0_12px_#22d3ee] bg-cyan-700 cursor-pointer w-16  rounded-full h-10 flex justify-center items-center" : "cursor-pointer w-16  rounded-full h-10 flex justify-center items-center"}>
             <div className="flex flex-col  items-center justify-center">
                 <Settings className={"stroke-white"}/>
                 <p className="text-white text-[10px]">Settings</p>

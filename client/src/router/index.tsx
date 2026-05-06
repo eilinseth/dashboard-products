@@ -6,6 +6,7 @@ import Product from "../pages/Product"
 import Categories from "../pages/Categories"
 import AddProduct from "../pages/AddProduct"
 import EditProduct from "../pages/EditProduct"
+import LoginPage from "../pages/LoginPage"
 
 const router = createBrowserRouter ([
     {
@@ -17,7 +18,8 @@ const router = createBrowserRouter ([
             {path:"products/:id",element:<Product />},
             {path:"products/new",element:<AddProduct />},
             {path:"/categories",element:<Categories />},
-            {path:"products/edit/:id",element:<EditProduct />}
+            {path:"products/edit/:id",element:<EditProduct />},
+            {path:"/login",element:<LoginPage />}
         ]
     }
 ])
