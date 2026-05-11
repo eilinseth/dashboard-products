@@ -254,5 +254,19 @@ const getCategories = async (req:Request , res:Response):Promise<void> => {
     }
 }
 
+const register = async(req:Request,res:Response):Promise<void> => {
+    try{
+        const {name,email,password} = req.body
+        if(!name?.trim() || !email?.trim() || !password?.trim() || password.length < 8 || !email.includes("@")){
+            res.status(400).json({message:"Bad Request"})
+            return
+        }
 
-export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories}
+        
+    }catch(error){
+        res.status(500).json({error:error.message})
+    }
+}
+
+
+export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register}
