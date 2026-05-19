@@ -288,5 +288,38 @@ const register = async(req:Request,res:Response):Promise<void> => {
     }
 }
 
+const login = async (req:Request,res:Response):Promise<void> => {
+    try{
+        const {email,password} = req.body
+        if(!email?.trim() || !password?.trim()){
+            res.status(400).json({message:"Bad Request"})
+            return
+        }
+        const [rows] = await pool.query<RowDataPacket[]>("SELECT id,password,role FROM users WHERE email = ?",[email])
+        if(rows.length === 0){
+            res.status(401).json({message:"Invalid email or password"})
+            return
+        }
+        const user = rows[0]
+        const hashedPassword = user.password
+        const isPasswordValid = await bcrypt.compare(password,hashedPassword)
+        if(!isPasswordValid){
+            res.status(401).json({message:"Invalid email or password"})
+            return
+        }
+        res.status(200).json({
+            message:"Login successful",
+            user : {
+                id:user.id,
+                role:user.role
+            }
+        })
+    }catch(error){
+        if(error instanceof Error){
+            res.status(500).json({message:error.message})
+        }
+        res.status(500).json({message:"Internal Server Error"})
+    }
+}
 
-export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register}
+export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login}
