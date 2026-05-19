@@ -1,7 +1,9 @@
 import { Request,Response } from "express";
 import { pool } from "../db";
 import type { Products , Categories} from "../types";
-import { ResultSetHeader } from "mysql2"; 
+import { ResultSetHeader, RowDataPacket } from "mysql2"; 
+import { Role } from "../types";
+import bcrypt from "bcrypt"
 
 
 
@@ -260,11 +262,29 @@ const register = async(req:Request,res:Response):Promise<void> => {
         if(!name?.trim() || !email?.trim() || !password?.trim() || password.length < 8 || !email.includes("@")){
             res.status(400).json({message:"Bad Request"})
             return
+        } 
+        const created_at = new Date()
+        const updated_at = new Date()
+        const role : Role = Role.User
+        const hashedPassword = await bcrypt.hash(password,10) 
+        const [duplicateEmail] = await pool.query<RowDataPacket[]>("SELECT id FROM users WHERE email = ?",[email])
+        if(duplicateEmail.length > 0){
+            res.status(409).json({message:"Email already exists"})
+            return
         }
+        
+        const result = await pool.query<ResultSetHeader>("INSERT INTO users (name,email,password,role,created_at,updated_at) VALUES (?,?,?,?,?,?)",[name,email,hashedPassword,role,created_at,updated_at])
 
+        res.status(201).json({
+            message:"User Registered",
+            id:result[0].insertId
+        })
         
     }catch(error){
-        res.status(500).json({error:error.message})
+        if(error instanceof Error){
+            res.status(500).json({message:error.message})
+        }
+        res.status(500).json({message:"Internal Server Error"})
     }
 }
 

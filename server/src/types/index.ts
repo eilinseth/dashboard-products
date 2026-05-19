@@ -13,3 +13,8 @@ export interface Categories {
     name : string,
     Total_Item : string
 }
+
+export enum Role {
+    Admin = "admin",
+    User = "user"
+}
