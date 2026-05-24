@@ -4,6 +4,7 @@ import type { Products , Categories} from "../types";
 import { ResultSetHeader, RowDataPacket } from "mysql2"; 
 import { Role } from "../types";
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
 
 
@@ -283,6 +284,7 @@ const register = async(req:Request,res:Response):Promise<void> => {
     }catch(error){
         if(error instanceof Error){
             res.status(500).json({message:error.message})
+            return
         }
         res.status(500).json({message:"Internal Server Error"})
     }
@@ -307,6 +309,18 @@ const login = async (req:Request,res:Response):Promise<void> => {
             res.status(401).json({message:"Invalid email or password"})
             return
         }
+        const secret = process.env.JWT_SECRET
+        const expiresIn = process.env.JWT_EXPIRES_IN || "30m"
+        if(!secret || !expiresIn){
+            res.status(500).json({message:"JWT secret or expiresIn not configured"})
+            return
+        }
+        const token = jwt.sign({id:user.id,role:user.role},secret as string,{expiresIn: "30m" }) 
+        res.cookie("token",token,{
+            httpOnly:true,
+            secure:false,
+            sameSite:"lax",
+        })
         res.status(200).json({
             message:"Login successful",
             user : {
@@ -317,9 +331,14 @@ const login = async (req:Request,res:Response):Promise<void> => {
     }catch(error){
         if(error instanceof Error){
             res.status(500).json({message:error.message})
+            return
         }
         res.status(500).json({message:"Internal Server Error"})
     }
 }
 
-export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login}
+const getMe = (req:Request,res:Response) => {
+    res.json({user:req.user})
+}
+
+export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login,getMe}

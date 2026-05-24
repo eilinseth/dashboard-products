@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories} from "../controller";
+import { getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login,getMe} from "../controller";
+import auth from "../middleware"
 import multer from "multer"
 
 const router = Router()
@@ -38,6 +39,10 @@ router.post("/products",upload.single('image'),addProduct)
 router.put("/products/:id",upload.single('image'),updateProduct)
 router.delete("/products/:id",deleteProduct)
 router.get("/categories",getCategories)
+router.post("/register",register)
+router.post("/login",login)
+router.get("/me",auth,getMe)
+
 
 
 export default router
