@@ -17,6 +17,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
     "mysql2": "^3.19.0",
     "nodemon": "^3.1.14"
@@ -30,6 +31,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
     "@types/node": "^25.3.5",
+    "@types/passport": "^1.0.17",
     "eslint": "^10.0.3",
     "globals": "^17.4.0",
     "ts-node": "^10.9.2",

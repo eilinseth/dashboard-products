@@ -259,11 +259,13 @@ const getCategories = async (req:Request , res:Response):Promise<void> => {
 
 const register = async(req:Request,res:Response):Promise<void> => {
     try{
-        const {name,email,password} = req.body
-        if(!name?.trim() || !email?.trim() || !password?.trim() || password.length < 8 || !email.includes("@")){
+        const {name:rawName,email:rawEmail,password} = req.body
+        const name = rawName?.trim()
+        const email = rawEmail?.trim()
+        if(!name || !email || !password?.trim() || password.length < 8 || !email.includes("@")){
             res.status(400).json({message:"Bad Request"})
             return
-        } 
+        }
         const created_at = new Date()
         const updated_at = new Date()
         const role : Role = Role.User
@@ -292,8 +294,9 @@ const register = async(req:Request,res:Response):Promise<void> => {
 
 const login = async (req:Request,res:Response):Promise<void> => {
     try{
-        const {email,password} = req.body
-        if(!email?.trim() || !password?.trim()){
+        const {email:rawEmail,password} = req.body
+        const email = rawEmail?.trim()
+        if(!email || !password?.trim()){
             res.status(400).json({message:"Bad Request"})
             return
         }

@@ -9,6 +9,7 @@ const auth = (req:Request,res:Response,next:NextFunction) =>{
     }
     try{
         const decoded = jwt.verify(token,process.env.JWT_SECRET!)
+        console.log(decoded)
         req.user = decoded as {id:number,role:string}
         next()
     }catch(error){
