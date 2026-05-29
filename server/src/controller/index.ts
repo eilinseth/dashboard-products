@@ -323,6 +323,7 @@ const login = async (req:Request,res:Response):Promise<void> => {
             httpOnly:true,
             secure:false,
             sameSite:"lax",
+            maxAge: 30 * 60 * 1000
         })
         res.status(200).json({
             message:"Login successful",
