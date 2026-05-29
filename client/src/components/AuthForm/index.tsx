@@ -1,20 +1,22 @@
 import {useNavigate} from "react-router-dom"
 import { useForm } from "react-hook-form";
+import type {AuthFormData} from "../../types"
 
 type Props = {
     title : string
     status? : string
+    onSubmit? : (data:AuthFormData) => void
 }
 
 
-const RegistForm: React.FC<Props> = ({title,status}) => {
+const AuthForm: React.FC<Props> = ({title,status,onSubmit}) => {
     const navigate = useNavigate();
-    const { register, handleSubmit, formState: { errors },reset } = useForm();
+    const { register, handleSubmit, formState: { errors },reset } = useForm<AuthFormData>();
 
-    const formSubmit = (data: any) => {
-        console.log(data)
+    const formSubmit = (data: AuthFormData) => {
+        onSubmit?.(data)    
         reset()
-    }
+    } 
 
     return (
         <section className="fixed inset-0 bg-[#111827] py-5 px-4 w-full">
@@ -33,7 +35,7 @@ const RegistForm: React.FC<Props> = ({title,status}) => {
                             <label htmlFor="email" className="font-semibold">Email</label>
                             <input {...register("email",
                                 { required: "email is required",
-                                })} type="text" className="text-slate-100 rounded-lg border-2 px-2 py-1 bg-slate-700 w-90"  placeholder="email ..."/>
+                                })} type="email" className="text-slate-100 rounded-lg border-2 px-2 py-1 bg-slate-700 w-90"  placeholder="email ..."/>
                             {errors.email && <p className="text-red-500 text-sm font-semibold mt-1">{errors.email.message as string}</p>}
                     </div>
 
@@ -56,4 +58,4 @@ const RegistForm: React.FC<Props> = ({title,status}) => {
     )
 }
 
-export default RegistForm
+export default AuthForm

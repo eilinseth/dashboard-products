@@ -24,3 +24,10 @@ export interface ProductBody {
     image : FileList
     description : string
 }
+
+export interface AuthFormData {
+    name? : string
+    email : string
+    password : string
+}
+
