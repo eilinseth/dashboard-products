@@ -38,7 +38,7 @@ const Settings = () =>{
                     </div>
                     <div className="text-base font-semibold text-white flex  px-2 cursor-pointer flex-col w-80">
                         <div className="font-semibold">Password</div>
-                        <div className="text-sm text-[#9CA3AF] ">update password</div>
+                        <div className="text-sm text-[#9CA3AF] ">Update Password</div>
                     </div>
                     <div className="flex items-center justify-end w-full pr-2">
                         <ChevronRight className="size-5 cursor-pointer"/>
