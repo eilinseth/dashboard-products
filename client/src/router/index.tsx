@@ -8,6 +8,7 @@ import AddProduct from "../pages/AddProduct"
 import EditProduct from "../pages/EditProduct"
 import LoginPage from "../pages/LoginPage"
 import Settings from "../pages/SettingsPage"
+import ChangeUsername from "../pages/ChangeUsername"
 
 const router = createBrowserRouter ([
     {
@@ -21,6 +22,7 @@ const router = createBrowserRouter ([
             {path:"/categories",element:<Categories />},
             {path:"products/edit/:id",element:<EditProduct />},
             {path:"/settings",element:<Settings />},
+            {path:"/settings/change-username",element:<ChangeUsername />},
             {path:"/login",element:<LoginPage />}
         ]
     }

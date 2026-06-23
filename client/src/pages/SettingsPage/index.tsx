@@ -3,8 +3,10 @@ import {ChevronRight} from "lucide-react"
 import {Lock} from "lucide-react"
 import {AlertCircle} from "lucide-react"
 import {LogOut} from "lucide-react"
+import { useNavigate } from "react-router-dom";
 
 const Settings = () =>{
+    const navigate = useNavigate();
     return (
         <section className="mt-4 px-4 w-full pb-20 text-[#E5E7EB]">
             <div className="flex w-full gap-3 items-center ">
@@ -20,11 +22,13 @@ const Settings = () =>{
             </div>
             <div className="mt-5 flex flex-col  ">
                 <div className="text-lg font-semibold mb-1">Account</div>
-                <div className="flex bg-slate-700 gap-2 w-full items-center px-4 py-2 border-b-slate-500 border-slate-400 border cursor-pointer">
+                <div className="flex bg-slate-700 gap-2 w-full items-center px-4 py-2 border-b-slate-500 border-slate-400 border cursor-pointer" onClick={() => 
+                        navigate("/settings/change-username")
+                    }>
                     <div className="flex items-center justify-center border-2 w-22 h-10 border-slate-500">
                         <User className={"stroke-[#E5E7EB] size-5"}/>
                     </div>
-                    <div className="text-base font-semibold text-white flex  px-2 cursor-pointer flex-col w-80">
+                    <div className="text-base font-semibold text-white flex  px-2 cursor-pointer flex-col w-80" >
                         <div className="font-semibold">Username</div>
                         <div className="text-sm text-[#9CA3AF] ">admin</div>
                     </div>
