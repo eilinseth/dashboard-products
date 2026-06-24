@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login,getMe} from "../controller";
+import { getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login,getMe,updateUsername,logout} from "../controller";
 import auth from "../middleware"
 import multer from "multer"
 
@@ -41,7 +41,9 @@ router.delete("/products/:id",deleteProduct)
 router.get("/categories",getCategories)
 router.post("/register",register)
 router.post("/login",login)
+router.post("/logout",auth,logout)
 router.get("/me",auth,getMe)
+router.patch("/user/username",auth,updateUsername)
 
 
 

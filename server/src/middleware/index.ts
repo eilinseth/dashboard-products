@@ -10,7 +10,7 @@ const auth = (req:Request,res:Response,next:NextFunction) =>{
     try{
         const decoded = jwt.verify(token,process.env.JWT_SECRET!)
         console.log(decoded)
-        req.user = decoded as {id:number,role:string}
+        req.user = decoded as {id:number,username:string,email:string,role:string}
         next()
     }catch(error){
         if(error instanceof jwt.JsonWebTokenError){
@@ -18,6 +18,7 @@ const auth = (req:Request,res:Response,next:NextFunction) =>{
             return
         }
         res.status(401).json({message:"Unauthorized"})
+        return
     }
 }
 

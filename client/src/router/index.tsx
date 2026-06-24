@@ -9,6 +9,8 @@ import EditProduct from "../pages/EditProduct"
 import LoginPage from "../pages/LoginPage"
 import Settings from "../pages/SettingsPage"
 import ChangeUsername from "../pages/ChangeUsername"
+import ChangePassword from "../pages/ChangePassword"
+import ProtectedRoute from "../components/ProtectedRoute"
 
 const router = createBrowserRouter ([
     {
@@ -21,8 +23,9 @@ const router = createBrowserRouter ([
             {path:"products/new",element:<AddProduct />},
             {path:"/categories",element:<Categories />},
             {path:"products/edit/:id",element:<EditProduct />},
-            {path:"/settings",element:<Settings />},
-            {path:"/settings/change-username",element:<ChangeUsername />},
+            {path:"/settings",element:<ProtectedRoute><Settings /></ProtectedRoute>},
+            {path:"/settings/change-username",element:<ProtectedRoute><ChangeUsername /></ProtectedRoute>},
+            {path:"/settings/change-password",element:<ProtectedRoute><ChangePassword /></ProtectedRoute>},
             {path:"/login",element:<LoginPage />}
         ]
     }

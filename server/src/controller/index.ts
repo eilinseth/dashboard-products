@@ -300,7 +300,7 @@ const login = async (req:Request,res:Response):Promise<void> => {
             res.status(400).json({message:"Bad Request"})
             return
         }
-        const [rows] = await pool.query<RowDataPacket[]>("SELECT id,password,role FROM users WHERE email = ?",[email])
+        const [rows] = await pool.query<RowDataPacket[]>("SELECT id,name,email,password,role FROM users WHERE email = ?",[email])
         if(rows.length === 0){
             res.status(401).json({message:"Invalid email or password"})
             return
@@ -318,7 +318,7 @@ const login = async (req:Request,res:Response):Promise<void> => {
             res.status(500).json({message:"JWT secret or expiresIn not configured"})
             return
         }
-        const token = jwt.sign({id:user.id,role:user.role},secret as string,{expiresIn: "30m" }) 
+        const token = jwt.sign({id:user.id,username:user.name,email:user.email,role:user.role},secret as string,{expiresIn: "2h" }) 
         res.cookie("token",token,{
             httpOnly:true,
             secure:false,
@@ -341,8 +341,45 @@ const login = async (req:Request,res:Response):Promise<void> => {
     }
 }
 
+const logout = (req:Request,res:Response):void => {
+    res.clearCookie("token",{
+        httpOnly:true,
+        secure:false,
+        sameSite:"lax"
+    })
+    res.status(200).json({message:"Logout successful"})
+}
+
 const getMe = (req:Request,res:Response) => {
     res.json({user:req.user})
 }
 
-export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login,getMe}
+const updateUsername = async (req:Request,res:Response):Promise<void> => {
+    try{
+        const {newUsername} = req.body
+        const userName = newUsername.trim()
+        if(!userName || userName.length < 3){
+            res.status(400).json({message:"Invalid Username"})
+            return
+        }
+
+        const userId = req.user.id
+
+        const [result] = await pool.query<ResultSetHeader>("UPDATE users SET name = ? WHERE id = ?",[userName,userId])
+        if(result.affectedRows === 0){
+            res.status(404).json({message:"User not found"})
+            return
+        }
+        res.json({message:"Username Updated"})
+
+    }catch(error){
+        if(error instanceof Error){
+            res.status(500).json({message:error.message})
+            return
+        }
+        res.status(500).json({message:"Internal Server Error"})
+        return
+    }
+}
+
+export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login,getMe,updateUsername,logout}
