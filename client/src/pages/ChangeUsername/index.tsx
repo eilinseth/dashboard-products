@@ -7,7 +7,7 @@ import {UserContext} from "../../context";
 import {useNavigate} from "react-router-dom";
 
 function ChangeUsername(){
-    const user = useContext(UserContext);
+    const {user,setUser} = useContext(UserContext)!;
     const navigate = useNavigate();
     const mutation = useMutation({
         mutationFn: changeUsername,
@@ -23,6 +23,7 @@ function ChangeUsername(){
         const data = Object.fromEntries(formData.entries());
         console.log(data)
         mutation.mutate(data.newUsername as string);
+        setUser((prevUser) => prevUser ? {...prevUser, username: data.newUsername as string} : prevUser);
     }
 
     return (    

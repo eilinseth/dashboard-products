@@ -2,11 +2,12 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {UserContext} from "../../context";
+import type {User} from "../../types";
     
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
-    const [user,setUser] = useState(null);
+    const [user,setUser] = useState<User | null>(null);
     const navigate = useNavigate();
     const [loading,setLoading] = useState(true);
 
@@ -30,7 +31,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     }
 
     return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={{user,setUser}}>
         {children}
     </UserContext.Provider>  
     ) 

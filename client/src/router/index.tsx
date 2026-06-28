@@ -11,6 +11,7 @@ import Settings from "../pages/SettingsPage"
 import ChangeUsername from "../pages/ChangeUsername"
 import ChangePassword from "../pages/ChangePassword"
 import ProtectedRoute from "../components/ProtectedRoute"
+import { Outlet } from "react-router-dom"
 
 const router = createBrowserRouter ([
     {
@@ -23,9 +24,16 @@ const router = createBrowserRouter ([
             {path:"products/new",element:<AddProduct />},
             {path:"/categories",element:<Categories />},
             {path:"products/edit/:id",element:<EditProduct />},
-            {path:"/settings",element:<ProtectedRoute><Settings /></ProtectedRoute>},
-            {path:"/settings/change-username",element:<ProtectedRoute><ChangeUsername /></ProtectedRoute>},
-            {path:"/settings/change-password",element:<ProtectedRoute><ChangePassword /></ProtectedRoute>},
+            {
+                path:"/settings",
+                element:<ProtectedRoute><Outlet /></ProtectedRoute>,
+                children:[
+                    {index:true,element:<Settings />},
+                    {path:"/settings/change-username",element:<ChangeUsername />},
+                    {path:"/settings/change-password",element:<ChangePassword />},
+                ]
+            },
+            
             {path:"/login",element:<LoginPage />}
         ]
     }

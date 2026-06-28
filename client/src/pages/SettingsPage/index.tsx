@@ -12,7 +12,7 @@ import { UserContext } from "../../context";
 
 const Settings = () =>{
     const navigate = useNavigate();
-    const user = useContext(UserContext);
+    const {user} = useContext(UserContext)!;
     const mutation = useMutation({
         mutationFn: logout,
         onSuccess: () => {
@@ -32,9 +32,9 @@ const Settings = () =>{
                     <div className="text-3xl font-semibold text-[#1F2937]">A</div>
                 </div>
                 <div className="flex flex-col gap-1">
-                    <div className="text-lg font-semibold">{user ? user.username : "Admin"}</div>
+                    <div className="text-lg font-semibold">{user?.username || "Admin"}</div>
                     <div className="text-sm text-[#9CA3AF]">
-                        {user ? user.email : "admin@example.com"}
+                        {user?.email || "admin@example.com"}
                     </div>
                 </div>
             </div>
@@ -48,7 +48,7 @@ const Settings = () =>{
                     </div>
                     <div className="text-base font-semibold text-white flex  px-2 cursor-pointer flex-col w-80" >
                         <div className="font-semibold">Username</div>
-                        <div className="text-sm text-[#9CA3AF] ">admin</div>
+                        <div className="text-sm text-[#9CA3AF] ">{user?.username || "admin"}</div>
                     </div>
                     <div className="flex items-center justify-end w-full pr-2">
                         <ChevronRight className="size-5 cursor-pointer"/>
