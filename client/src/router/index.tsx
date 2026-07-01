@@ -29,10 +29,11 @@ const router = createBrowserRouter ([
                     {path:"/settings",element:<Settings />,},
                     {path:"/settings/change-username",element:<ChangeUsername />},
                     {path:"/settings/change-password",element:<ChangePassword />},
-                    {path:"/login",element:<LoginPage />}]
-                }
+                ]
+            }
         ]
-    }
+    },
+    {path:"/login",element:<LoginPage />}
 ])
 
 export default router

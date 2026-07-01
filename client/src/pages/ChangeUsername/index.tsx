@@ -1,6 +1,6 @@
 import SettingsForm from "../../components/SettingsForm";
 import {useMutation} from "@tanstack/react-query";
-import {changeUsername} from "../../api/changeUsername";
+import {changeUsername} from "../../api/updateUsername";
 import toast from "react-hot-toast";
 import {useContext} from "react";
 import {UserContext} from "../../context";

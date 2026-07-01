@@ -382,4 +382,50 @@ const updateUsername = async (req:Request,res:Response):Promise<void> => {
     }
 }
 
-export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login,getMe,updateUsername,logout}
+const updatePassword = async (req:Request,res:Response):Promise<void> => {
+    try{
+        const {oldPassword,newPassword} = req.body
+        const userId = req.user.id
+        const trimmedOldPassword = oldPassword?.trim()
+        const trimmedNewPassword = newPassword?.trim()
+
+        if(!trimmedOldPassword || !trimmedNewPassword ){
+            res.status(400).json({message:"Bad Request"})
+            return
+        }
+
+        if(trimmedNewPassword.length < 6){
+            res.status(400).json({message:"New password must be at least 6 characters long"})
+            return
+        }
+
+        const [rows] = await pool.query<RowDataPacket[]>("SELECT password FROM users WHERE id = ?",[userId])
+        if(rows.length === 0){
+            res.status(404).json({message:"User not found"})
+            return
+        }
+        const hashedPassword = rows[0].password
+        const isOldPasswordValid = await bcrypt.compare(trimmedOldPassword,hashedPassword)
+        if(!isOldPasswordValid){
+            res.status(400).json({message:"Invalid old password"})
+            return
+        }
+        const newHashedPassword = await bcrypt.hash(trimmedNewPassword,10)
+        const [result] = await pool.query<ResultSetHeader>("UPDATE users SET password = ? WHERE id = ?",[newHashedPassword,userId])
+        if(result.affectedRows === 0){
+            res.status(404).json({message:"User not found"})
+            return
+        }
+        res.json({message:"Password Updated"})
+
+    }catch(error){
+        if(error instanceof Error){
+            res.status(500).json({message:error.message})
+            return
+        }
+        res.status(500).json({message:"Internal Server Error"})
+        return
+    }
+}
+
+export {getProducts,getProduct,addProduct,updateProduct,deleteProduct,getCategories,register,login,getMe,updateUsername,logout,updatePassword}
