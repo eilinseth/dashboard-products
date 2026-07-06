@@ -6,6 +6,7 @@ import {useMutation} from "@tanstack/react-query";
 import {updatePassword} from "../../api/updatePassword";
 import toast from "react-hot-toast";
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 
 function ChangePassword(){
@@ -30,8 +31,12 @@ function ChangePassword(){
             navigate(-1);
         },
         onError: (error) => {
-            toast.error("Failed to update password");
-            console.error("Error updating password:", error);
+            if(axios.isAxiosError(error)){
+                const message = error.response?.data?.message || "Failed to update password";
+                toast.error(message);
+            }else{
+                toast.error("Something went wrong");
+            }
         }
     });
     function onSubmit(data: PasswordFormData){

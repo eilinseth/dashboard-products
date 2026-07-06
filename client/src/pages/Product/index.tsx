@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import toast from "react-hot-toast"
+import axios from "axios"
 
 function Product (){
     const {id} = useParams()
@@ -28,8 +29,12 @@ function Product (){
             
         },
         onError : (error) =>{
-            toast.error("Product failed to delete")
-            console.error(error.message)
+            if(axios.isAxiosError(error)){
+                const message = error.response?.data?.message || "Failed to delete product";
+                toast.error(message);
+            }else{
+                toast.error("Something went wrong")
+            }
         }
     })
 

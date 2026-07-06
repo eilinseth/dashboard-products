@@ -6,13 +6,9 @@ type editParams = {
 }
 
 export const editProduct = async({data,id}:editParams) =>{
-    try{
         await axios({
             method:"PUT",
             url:`http://localhost:5000/products/${id}`,
             data
         })
-    }catch(error){
-        throw new Error(`${error}`)
-    }
 }

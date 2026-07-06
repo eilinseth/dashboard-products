@@ -8,106 +8,107 @@ import jwt from "jsonwebtoken"
 
 
 
-const getProducts = async(req:Request,res:Response):Promise<void> => {
-    try{
-        const {stock,category,minPrice,maxPrice} = req.query
-        if((minPrice && Number.isNaN(Number(minPrice))) || (maxPrice && Number.isNaN(Number(maxPrice)))){
-            console.error("error")
-            return 
-        }
-        const minNumberPrice = minPrice ? Number(minPrice) : null 
-        const maxNumberPrice = maxPrice ? Number(maxPrice) : null
-        if(minNumberPrice !== null && maxNumberPrice !==null && minNumberPrice > maxNumberPrice){
-            console.error("error")
-            return
-        }
-        const rawPage = Number(req.query.page)
-        let page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage
-        const limit = 10
-        const offset = (page - 1) * limit
-        let query = "SELECT p.id,p.name,p.price,p.stock,p.description,c.name as category,p.image_url,p.created_at FROM products p JOIN categories c ON c.id = p.id_category"
+const getProducts = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { stock, category, searchItem } = req.query;
+        const inputSortBy = String(req.query.sortBy ?? "created_at");
+        const inputSortType = String(req.query.sortType ?? "desc");
+        const rawPage = Number(req.query.page);
+        const rawMinPrice = req.query.minPrice;
+        const rawMaxPrice = req.query.maxPrice;
 
-        const category_id = Number(category)
-        const values = []
-        const conditions = []
-        const inputSortBy = String(req.query.sortBy)
-        const inputSortType = String(req.query.sortType)
-        const searchItem = req.query.searchItem 
-        console.log(page)
-        
-        if(typeof searchItem === "string"){
-            const searchItemTrimmed = searchItem.trim()
-            if(searchItemTrimmed){
-                conditions.push("p.name LIKE ?")
-                values.push(`%${searchItemTrimmed}%`)
-            }
-        }
-        if(category_id && minNumberPrice && maxNumberPrice){    
-            conditions.push( "(price BETWEEN ? AND ? ) AND p.id_category = ?")
-            values.push(minNumberPrice,maxNumberPrice,category_id)
-        }
-        if(minNumberPrice && category_id){
-            conditions.push( "price >= ? AND p.id_category = ?")
-            values.push(minNumberPrice,category_id)
-        }
-        if(maxNumberPrice && category_id){
-            conditions.push( "price <= ? AND p.id_category = ?")
-            values.push(maxNumberPrice,category_id)
-        } 
-        if(category_id){
-            conditions.push( "p.id_category =?")
-            values.push(category_id)
-        }
-        if(stock === "low") {
-            conditions.push( "stock <=?")
-            values.push(10)
-        }
-        if(minNumberPrice !== null){
-            conditions.push( "price >= ?")
-            values.push(minNumberPrice)
-        }
-        if(maxNumberPrice !== null){
-            conditions.push( "price <= ?")
-            values.push(maxNumberPrice)
-        }
-        if(conditions.length > 0){
-            query += " WHERE " + conditions.join(" AND ")
-        }
-        if(typeof inputSortBy === "string"){
-            const sortBy = ['name','price','stock','created_at'].includes(inputSortBy) ? inputSortBy : 'created_at'
-            const sortType = inputSortType === 'asc' ? 'asc' : 'desc'
-            if(sortBy){
-                query += (` ORDER BY p.${sortBy} ${sortType}`)
-            }
+        const minPrice = rawMinPrice !== undefined ? Number(rawMinPrice) : null;
+        const maxPrice = rawMaxPrice !== undefined ? Number(rawMaxPrice) : null;
+        const category_id = category ? Number(category) : null;
 
+        if (minPrice !== null && Number.isNaN(minPrice)) {
+            res.status(400).json({ message: "minPrice tidak valid" });
+            return;
         }
-        if(page){
-            query += " limit ? offset ?"
-            values.push(limit,offset)
+        if (maxPrice !== null && Number.isNaN(maxPrice)) {
+            res.status(400).json({ message: "maxPrice tidak valid" });
+            return;
         }
-        console.log(offset)
-        console.log(query)
-        const [total] = await pool.query("SELECT count(*) as total from products")
-        console.log(total[0].total)
-        const totalData = total[0].total
-        const [rows] = await pool.query(query,values)
-        const data = rows as Products[]
-        let totalPage = Math.ceil(total[0].total / limit)
-        if( page > totalPage && totalPage > 0) page = totalPage 
+        if (minPrice !== null && maxPrice !== null && minPrice > maxPrice) {
+            res.status(400).json({ message: "minPrice tidak boleh lebih besar dari maxPrice" });
+            return;
+        }
+
+        const conditions: string[] = [];
+        const values: (string | number)[] = [];
+
+        if (typeof searchItem === "string" && searchItem.trim()) {
+            conditions.push("p.name LIKE ?");
+            values.push(`%${searchItem.trim()}%`);
+        }
+
+        if (category_id) {
+            conditions.push("p.id_category = ?");
+            values.push(category_id);
+        }
+
+        if (minPrice !== null) {
+            conditions.push("p.price >= ?");
+            values.push(minPrice);
+        }
+
+        if (maxPrice !== null) {
+            conditions.push("p.price <= ?");
+            values.push(maxPrice);
+        }
+
+        if (stock === "low") {
+            conditions.push("p.stock <= ?");
+            values.push(10);
+        }
+
+        const whereClause = conditions.length > 0
+            ? " WHERE " + conditions.join(" AND ")
+            : "";
+
+        const allowedSortBy = ["name", "price", "stock", "created_at"];
+        const sortBy = allowedSortBy.includes(inputSortBy) ? inputSortBy : "created_at";
+        const sortType = inputSortType === "asc" ? "ASC" : "DESC";
+        const orderClause = ` ORDER BY p.${sortBy} ${sortType}`;
+
+        const [countRows] = await pool.query<RowDataPacket[]>(
+            `SELECT COUNT(*) as total FROM products p JOIN categories c ON c.id = p.id_category${whereClause}`,
+            values
+        );
+        const totalData = countRows[0].total as number;
+        const totalPage = Math.ceil(totalData / 10) || 1;
+
+        const limit = 10;
+        let page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+        if (page > totalPage) page = totalPage;
+        const offset = (page - 1) * limit;
+
+        const mainQuery = `
+            SELECT p.id, p.name, p.price, p.stock, p.description,c.name as category, p.image_url, p.created_at
+            FROM products p
+            JOIN categories c ON c.id = p.id_category
+            ${whereClause}
+            ${orderClause}
+            LIMIT ? OFFSET ?
+        `;
+
+        const [rows] = await pool.query<RowDataPacket[]>(mainQuery, [...values, limit, offset]);
 
         res.json({
-            status:200,
-            message:"OK",
-            data,
-            total : totalData,
+            status: 200,
+            message: "OK",
+            data: rows as Products[],
+            total: totalData,
+            totalPage,
             limit,
-            page
-        })
-    }catch(error){
-        console.error(error)
-        res.status(500).json({error:error.message})
+            page,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-}
+};
 
 const getProduct = async (req:Request,res:Response):Promise<void>  =>{
     try{

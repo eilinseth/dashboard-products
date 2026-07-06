@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import type { AuthFormData } from "../../types";
 import {useNavigate} from "react-router-dom";
+import {isAxiosError} from "axios";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -17,8 +18,13 @@ function LoginPage() {
       navigate("/products");
     },
     onError: (error) => {
-      console.error(error.message);
-      toast.error("Login failed");
+      console.log(isAxiosError(error))
+      if(isAxiosError(error)){
+        const message = error.response?.data?.message || "Login failed";
+        toast.error(message);
+      }else{
+        toast.error("Something went wrong");
+      }
     },
   });
 

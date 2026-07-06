@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import {useContext} from "react";
 import {UserContext} from "../../context";
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 function ChangeUsername(){
     const {user,setUser} = useContext(UserContext)!;
@@ -14,7 +15,13 @@ function ChangeUsername(){
         onSuccess: () => {
             toast.success("Username Updated ");
             navigate(-1);
-        }
+        },onError: (error) => {
+            if(axios.isAxiosError(error)){
+                const message = error.response?.data?.message || "Failed to update username";
+                toast.error(message);
+            }else{
+                toast.error("Something went wrong");
+            }}
     });
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

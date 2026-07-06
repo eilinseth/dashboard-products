@@ -1,4 +1,3 @@
-import {useNavigate} from "react-router-dom"
 import { useForm } from "react-hook-form";
 import type {AuthFormData} from "../../types"
 
@@ -10,7 +9,6 @@ type Props = {
 
 
 const AuthForm: React.FC<Props> = ({title,status,onSubmit}) => {
-    const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors },reset } = useForm<AuthFormData>();
 
     const formSubmit = (data: AuthFormData) => {
@@ -49,11 +47,6 @@ const AuthForm: React.FC<Props> = ({title,status,onSubmit}) => {
                     <button type="submit" className="border-0 border-[navy] text-[#E5E7EB] bg-green-600 font-semibold rounded-lg p-1 px-4 mt-4 cursor-pointer">Submit</button>
 
                 </form>
-                    {status === "login" ? (
-                    <div className="text-[#E5E7EB] text-center mt-5">Don't have account yet ? <nav className="text-blue-700 cursor-pointer inline" onClick={() => navigate("/register")}>Sign in</nav></div>
-                    ) : (
-                    <div className="text-[#E5E7EB] text-center mt-5">Already have an account ? <nav className="text-blue-700 cursor-pointer inline" onClick={() => navigate("/login")}>Login</nav></div>
-                    )}
         </section>
     )
 }

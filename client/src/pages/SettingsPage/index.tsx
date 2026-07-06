@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { useMutation } from "@tanstack/react-query";
 import { useContext } from "react";
 import { UserContext } from "../../context";
+import axios from "axios";
 
 const Settings = () =>{
     const navigate = useNavigate();
@@ -18,7 +19,13 @@ const Settings = () =>{
         onSuccess: () => {
             toast.success("Logged out successfully");
             navigate("/login");
-        }
+        },onError: (error) => {
+            if(axios.isAxiosError(error)){
+                const message = error.response?.data?.message || "Failed to logout";
+                toast.error(message);
+            }else{
+                toast.error("Something went wrong");
+            }}
     });
 
     const handleLogout = () => {

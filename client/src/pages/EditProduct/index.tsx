@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { getProduct } from "../../api/getProduct";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 
 function EditProduct (){
@@ -19,8 +20,12 @@ function EditProduct (){
             client.invalidateQueries({queryKey:['product',productId]})
             client.invalidateQueries({queryKey:['products']})
         },onError : (error) => {
-            toast.error("Update failed")
-            console.error(error)
+            if(axios.isAxiosError(error)){
+                const message = error.response?.data?.message || "Failed to update product";
+                toast.error(message);
+            }else{
+                toast.error("Something went wrong");
+            }
         }
     })
 
